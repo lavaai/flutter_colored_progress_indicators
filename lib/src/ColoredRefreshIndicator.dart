@@ -95,17 +95,17 @@ class ColoredRefreshIndicator extends StatefulWidget {
   /// If it is null, it will be defaulted to [MaterialLocalizations.refreshIndicatorSemanticLabel].
   /// An empty string may be passed to avoid having anything read by screen reading software.
   /// The [semanticsValue] may be used to specify progress on the widget.
-  const ColoredRefreshIndicator({
-    Key? key,
-    required this.child,
-    this.displacement = 40.0,
-    required this.onRefresh,
-    this.backgroundColor,
-    this.notificationPredicate = defaultScrollNotificationPredicate,
-    this.semanticsLabel,
-    this.semanticsValue,
-    this.strokeWidth = 2.0
-    }) : super(key: key);
+  const ColoredRefreshIndicator(
+      {Key? key,
+      required this.child,
+      this.displacement = 40.0,
+      required this.onRefresh,
+      this.backgroundColor,
+      this.notificationPredicate = defaultScrollNotificationPredicate,
+      this.semanticsLabel,
+      this.semanticsValue,
+      this.strokeWidth = 2.0})
+      : super(key: key);
 
   /// The widget below this widget in the tree.
   ///
@@ -156,7 +156,8 @@ class ColoredRefreshIndicator extends StatefulWidget {
 
 /// Contains the state for a [ColoredRefreshIndicator]. This class can be used to
 /// programmatically show the refresh indicator, see the [show] method.
-class ColoredRefreshIndicatorState extends State<ColoredRefreshIndicator> with TickerProviderStateMixin<ColoredRefreshIndicator> {
+class ColoredRefreshIndicatorState extends State<ColoredRefreshIndicator>
+    with TickerProviderStateMixin<ColoredRefreshIndicator> {
   late AnimationController _positionController;
   late AnimationController _scaleController;
   late Animation<double> _positionFactor;
@@ -169,16 +170,20 @@ class ColoredRefreshIndicatorState extends State<ColoredRefreshIndicator> with T
   bool? _isIndicatorAtTop;
   double? _dragOffset;
 
-  static final Animatable<double> _threeQuarterTween = Tween<double>(begin: 0.0, end: 0.75);
-  static final Animatable<double> _kDragSizeFactorLimitTween = Tween<double>(begin: 0.0, end: _kDragSizeFactorLimit);
-  static final Animatable<double> _oneToZeroTween = Tween<double>(begin: 1.0, end: 0.0);
+  static final Animatable<double> _threeQuarterTween =
+      Tween<double>(begin: 0.0, end: 0.75);
+  static final Animatable<double> _kDragSizeFactorLimitTween =
+      Tween<double>(begin: 0.0, end: _kDragSizeFactorLimit);
+  static final Animatable<double> _oneToZeroTween =
+      Tween<double>(begin: 1.0, end: 0.0);
 
   @override
   void initState() {
     super.initState();
     _positionController = AnimationController(vsync: this);
     _positionFactor = _positionController.drive(_kDragSizeFactorLimitTween);
-    _value = _positionController.drive(_threeQuarterTween); // The "value" of the circular progress indicator during a drag.
+    _value = _positionController.drive(
+        _threeQuarterTween); // The "value" of the circular progress indicator during a drag.
 
     _scaleController = AnimationController(vsync: this);
     _scaleFactor = _scaleController.drive(_oneToZeroTween);
@@ -189,11 +194,11 @@ class ColoredRefreshIndicatorState extends State<ColoredRefreshIndicator> with T
     final ThemeData theme = Theme.of(context);
     _valueColor = _positionController.drive(
       ColorTween(
-        begin: (/*widget.color ??*/ theme.accentColor).withOpacity(0.0),
-        end: (/*widget.color ??*/ theme.accentColor).withOpacity(1.0),
-      ).chain(CurveTween(
-        curve: const Interval(0.0, 1.0 / _kDragSizeFactorLimit)
-      )),
+        begin:
+            (/*widget.color ??*/ theme.colorScheme.secondary).withOpacity(0.0),
+        end: (/*widget.color ??*/ theme.colorScheme.secondary).withOpacity(1.0),
+      ).chain(
+          CurveTween(curve: const Interval(0.0, 1.0 / _kDragSizeFactorLimit))),
     );
     super.didChangeDependencies();
   }
@@ -207,8 +212,11 @@ class ColoredRefreshIndicatorState extends State<ColoredRefreshIndicator> with T
 
   bool _handleScrollNotification(ScrollNotification notification) {
     if (!widget.notificationPredicate(notification)) return false;
-     if ((notification is ScrollStartNotification || notification is ScrollUpdateNotification) &&
-        notification.metrics.extentBefore == 0.0 && _mode == null && _start(notification.metrics.axisDirection)) {
+    if ((notification is ScrollStartNotification ||
+            notification is ScrollUpdateNotification) &&
+        notification.metrics.extentBefore == 0.0 &&
+        _mode == null &&
+        _start(notification.metrics.axisDirection)) {
       setState(() {
         _mode = _ColoredRefreshIndicatorMode.drag;
       });
@@ -228,9 +236,12 @@ class ColoredRefreshIndicatorState extends State<ColoredRefreshIndicator> with T
         break;
     }
     if (indicatorAtTopNow != _isIndicatorAtTop) {
-      if (_mode == _ColoredRefreshIndicatorMode.drag || _mode == _ColoredRefreshIndicatorMode.armed) _dismiss(_ColoredRefreshIndicatorMode.canceled);
+      if (_mode == _ColoredRefreshIndicatorMode.drag ||
+          _mode == _ColoredRefreshIndicatorMode.armed)
+        _dismiss(_ColoredRefreshIndicatorMode.canceled);
     } else if (notification is ScrollUpdateNotification) {
-      if (_mode == _ColoredRefreshIndicatorMode.drag || _mode == _ColoredRefreshIndicatorMode.armed) {
+      if (_mode == _ColoredRefreshIndicatorMode.drag ||
+          _mode == _ColoredRefreshIndicatorMode.armed) {
         if (notification.metrics.extentBefore > 0.0) {
           _dismiss(_ColoredRefreshIndicatorMode.canceled);
         } else {
@@ -238,14 +249,16 @@ class ColoredRefreshIndicatorState extends State<ColoredRefreshIndicator> with T
           _checkDragOffset(notification.metrics.viewportDimension);
         }
       }
-      if (_mode == _ColoredRefreshIndicatorMode.armed && notification.dragDetails == null) {
+      if (_mode == _ColoredRefreshIndicatorMode.armed &&
+          notification.dragDetails == null) {
         // On iOS start the refresh when the Scrollable bounces back from the
         // overscroll (ScrollNotification indicating this don't have dragDetails
         // because the scroll activity is not directly triggered by a drag).
         _show();
       }
     } else if (notification is OverscrollNotification) {
-      if (_mode == _ColoredRefreshIndicatorMode.drag || _mode == _ColoredRefreshIndicatorMode.armed) {
+      if (_mode == _ColoredRefreshIndicatorMode.drag ||
+          _mode == _ColoredRefreshIndicatorMode.armed) {
         _dragOffset = _dragOffset! - notification.overscroll;
         _checkDragOffset(notification.metrics.viewportDimension);
       }
@@ -268,7 +281,7 @@ class ColoredRefreshIndicatorState extends State<ColoredRefreshIndicator> with T
   bool _handleGlowNotification(OverscrollIndicatorNotification notification) {
     if (notification.depth != 0 || !notification.leading) return false;
     if (_mode == _ColoredRefreshIndicatorMode.drag) {
-      notification.disallowGlow();
+      notification.disallowIndicator();
       return true;
     }
     return false;
@@ -298,11 +311,17 @@ class ColoredRefreshIndicatorState extends State<ColoredRefreshIndicator> with T
   }
 
   void _checkDragOffset(double containerExtent) {
-    assert(_mode == _ColoredRefreshIndicatorMode.drag || _mode == _ColoredRefreshIndicatorMode.armed);
-    double newValue = _dragOffset! / (containerExtent * _kDragContainerExtentPercentage);
-    if (_mode == _ColoredRefreshIndicatorMode.armed) newValue = math.max(newValue, 1.0 / _kDragSizeFactorLimit);
-    _positionController.value = newValue.clamp(0.0, 1.0); // this triggers various rebuilds
-    if (_mode == _ColoredRefreshIndicatorMode.drag && _valueColor!.value!.alpha == 0xFF) _mode = _ColoredRefreshIndicatorMode.armed;
+    assert(_mode == _ColoredRefreshIndicatorMode.drag ||
+        _mode == _ColoredRefreshIndicatorMode.armed);
+    double newValue =
+        _dragOffset! / (containerExtent * _kDragContainerExtentPercentage);
+    if (_mode == _ColoredRefreshIndicatorMode.armed)
+      newValue = math.max(newValue, 1.0 / _kDragSizeFactorLimit);
+    _positionController.value =
+        newValue.clamp(0.0, 1.0); // this triggers various rebuilds
+    if (_mode == _ColoredRefreshIndicatorMode.drag &&
+        _valueColor!.value!.alpha == 0xFF)
+      _mode = _ColoredRefreshIndicatorMode.armed;
   }
 
   // Stop showing the refresh indicator.
@@ -311,16 +330,19 @@ class ColoredRefreshIndicatorState extends State<ColoredRefreshIndicator> with T
     // This can only be called from _show() when refreshing and
     // _handleScrollNotification in response to a ScrollEndNotification or
     // direction change.
-    assert(newMode == _ColoredRefreshIndicatorMode.canceled || newMode == _ColoredRefreshIndicatorMode.done);
+    assert(newMode == _ColoredRefreshIndicatorMode.canceled ||
+        newMode == _ColoredRefreshIndicatorMode.done);
     setState(() {
       _mode = newMode;
     });
     switch (_mode) {
       case _ColoredRefreshIndicatorMode.done:
-        await _scaleController.animateTo(1.0, duration: _kIndicatorScaleDuration);
+        await _scaleController.animateTo(1.0,
+            duration: _kIndicatorScaleDuration);
         break;
       case _ColoredRefreshIndicatorMode.canceled:
-        await _positionController.animateTo(0.0, duration: _kIndicatorScaleDuration);
+        await _positionController.animateTo(0.0,
+            duration: _kIndicatorScaleDuration);
         break;
       default:
         assert(false);
@@ -340,7 +362,10 @@ class ColoredRefreshIndicatorState extends State<ColoredRefreshIndicator> with T
     final Completer<void> completer = Completer<void>();
     _pendingRefreshFuture = completer.future;
     _mode = _ColoredRefreshIndicatorMode.snap;
-    _positionController.animateTo(1.0 / _kDragSizeFactorLimit, duration: _kIndicatorSnapDuration).then<void>((void value) {
+    _positionController
+        .animateTo(1.0 / _kDragSizeFactorLimit,
+            duration: _kIndicatorSnapDuration)
+        .then<void>((void value) {
       if (mounted && _mode == _ColoredRefreshIndicatorMode.snap) {
         setState(() {
           // Show the indeterminate progress indicator.
@@ -375,7 +400,8 @@ class ColoredRefreshIndicatorState extends State<ColoredRefreshIndicator> with T
   /// actual scroll view. It defaults to showing the indicator at the top. To
   /// show it at the bottom, set `atTop` to false.
   Future<void> show({bool atTop = true}) {
-    if (_mode != _ColoredRefreshIndicatorMode.refresh && _mode != _ColoredRefreshIndicatorMode.snap) {
+    if (_mode != _ColoredRefreshIndicatorMode.refresh &&
+        _mode != _ColoredRefreshIndicatorMode.snap) {
       if (_mode == null) _start(atTop ? AxisDirection.down : AxisDirection.up);
       _show();
     }
@@ -403,7 +429,9 @@ class ColoredRefreshIndicatorState extends State<ColoredRefreshIndicator> with T
       return true;
     }());
 
-    final bool showIndeterminateIndicator = _mode == _ColoredRefreshIndicatorMode.refresh || _mode == _ColoredRefreshIndicatorMode.done;
+    final bool showIndeterminateIndicator =
+        _mode == _ColoredRefreshIndicatorMode.refresh ||
+            _mode == _ColoredRefreshIndicatorMode.done;
 
     return Stack(
       children: <Widget>[
@@ -418,8 +446,12 @@ class ColoredRefreshIndicatorState extends State<ColoredRefreshIndicator> with T
               axisAlignment: _isIndicatorAtTop! ? 1.0 : -1.0,
               sizeFactor: _positionFactor, // this is what brings it down
               child: Container(
-                padding: _isIndicatorAtTop! ? EdgeInsets.only(top: widget.displacement) : EdgeInsets.only(bottom: widget.displacement),
-                alignment: _isIndicatorAtTop! ? Alignment.topCenter : Alignment.bottomCenter,
+                padding: _isIndicatorAtTop!
+                    ? EdgeInsets.only(top: widget.displacement)
+                    : EdgeInsets.only(bottom: widget.displacement),
+                alignment: _isIndicatorAtTop!
+                    ? Alignment.topCenter
+                    : Alignment.bottomCenter,
                 child: ScaleTransition(
                   scale: _scaleFactor,
                   child: AnimatedBuilder(
@@ -427,7 +459,9 @@ class ColoredRefreshIndicatorState extends State<ColoredRefreshIndicator> with T
                     builder: (BuildContext context, Widget? child) {
                       // Default RefreshProgressIndicator replaced by modified one
                       return ColoredRefreshProgressIndicator(
-                        semanticsLabel: widget.semanticsLabel ?? MaterialLocalizations.of(context).refreshIndicatorSemanticLabel,
+                        semanticsLabel: widget.semanticsLabel ??
+                            MaterialLocalizations.of(context)
+                                .refreshIndicatorSemanticLabel,
                         semanticsValue: widget.semanticsValue,
                         value: showIndeterminateIndicator ? null : _value.value,
                         valueColor: _valueColor,
